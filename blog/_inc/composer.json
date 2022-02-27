@@ -1,0 +1,6 @@
+{
+    "require": {
+        "twbs/bootstrap": "^5.1",
+        "tamtamchik/simple-flash": "^2.0"
+    }
+}

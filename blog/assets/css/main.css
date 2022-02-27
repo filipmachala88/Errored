@@ -1,0 +1,20 @@
+.controls a{
+    text-decoration: none;
+}
+.controls a:hover{
+    text-decoration: underline;
+}
+.list-group-item{
+    /* kontrola pro script na zjištění barvy pozadí
+    background: black !important;
+    color: white !important;
+    */
+    display:flex;
+}
+.list-group-item .controls{
+    display: none;
+}
+.list-group-item:hover .controls{
+    display: flex;
+    margin: 0 0 0 auto;
+}

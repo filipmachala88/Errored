@@ -1,0 +1,10 @@
+14 Feb 2022, 18:32
+---------------------------
+SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ';asdasd casssd' at line 1in [ C:\MAMP\htdocs\blog\_inc\config.php ] 
+
+
+14 Feb 2022, 19:08
+---------------------------
+SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ';asdasd casssd' at line 1in [ C:\MAMP\htdocs\blog\_inc\config.php ] 
+
+

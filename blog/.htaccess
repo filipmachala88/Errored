@@ -1,0 +1,25 @@
+# .htacces soubor bývá v rootu
+
+# Turn on URL rewriting
+# povolíme přepisování adres
+RewriteEngine On
+  
+# Installation directory
+# v jakém adresáři se nachází naše apliikace - důležité zzměnit podle toho, jak to máme nazvané (pokud není ve složce [je v rootu] - bude tam pouze lomítko)
+RewriteBase /blog/
+  
+# Protect application and system files from being viewed
+# můžeme vylistovat adresáře, do kterých nechceme, aby měl uživatel přístup
+RewriteRule ^(_inc) - [F,L]
+# např. pokud zadá pouze localhost - uvidí, co vše zasložky tam máme -> díky tomuto dostane "Forbidden - you dont have permission"
+# můžeme přidat další - odděluje se pomocí | např. (_inc|admin|system) - všechny tyto adresáře bude mít zakázané (neuuvidí)
+  
+# Allow any files or directories that exist to be displayed directly
+# Pokud linkuji na konkrétní existující soubor/adresu, tak se otevře - pokud neexistuje, jde dál (na RewriteRule index.php)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+# v případě že mám localhost/blog/assets/css/main.css, tak aby se šlo přimo na něj (aby nedopsal index.php/assets)
+  
+# Rewrite all other URLs to index.php/
+# vše co se nachází za RewriteBase (2 údaj souboru) přidělal za index.php soubor
+RewriteRule .* index.php/$0 [PT,L]

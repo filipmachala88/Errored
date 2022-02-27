@@ -1,0 +1,105 @@
+ == DATABÁZE BLOGU ==
+- blog obsahuje nejčastěji:
+    1. příspěvky (posts)
+    2. komentáře (comments)
+    3. tagy (tags) - budou reprezentovat témy (abychom si mohlí najít, které příspěvky se týkají dané témy)
+- vytvoříme tedy pro každý z nich vlastní tabulku
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+== VYTVOŘENÍ TABULEK ==
+1. TABULKA "posts"
+- pro tabulku "posts" (pro příspěvky) budeme potřebovat:
+    - id (číslování příspěvku) - INT, můžeme také zvolit mediumINT
+    - user_id (id toho, kdo ho vytvořil - 1 příspěvek může patřit 1 uživateli) - INT
+    - title (název příspěvku) - VARCHAR = libovolné množství písmen, které je limitované délkou, požívá se pro kratší slovní spojení
+        - vypisujeme na více místech
+    - text (obsah příspěvku) - TEXT = pro blok textu, můžeme také zvolit mediumTEXT
+        - vypisujeme na jednom místě (na samotném příspěvku) - často bývá tabulka zvlášť pro texty
+    - slug (název příspěvku bez interpunkce a mezer, často používán v URL, např. post/this-is-a-title) - VARCHAR
+    - created_at (kdy byl příspěvek vytvořen) - TIMESTAMP
+        - CURRENT_TIMESTAMP - vyplní se na aktuální datum (pouze jeden řádek může mít v databázi), nastavíme ho jako Insert
+    - updated_at (kdy byl příspěvek naposled upraven) - TIMESTAMP
+        - CURRENT_TIMESTAMP - chtěli bychom použít i zde, lze obejít přes TRIGGER (pokud nemáme v databázi, tak přidat jako kód), nstavíme ho jako Upload
+
+    TRIGGER (spouštěč)
+    - Ak sa stane niečo, spraviť niečo iné.
+    - Napríklad ak sa vloží nový riadok alebo upraví riadok, aby sa automaticky vyplnili created_at a updated_at časy a dátumy:
+
+    VYTVOŘENÍ TABULKY "posts"
+    - Samozrejme v nástrojoch ako Sequel Pro alebo phpMyAdmin alebo adminer si databázy môžeme vyklikať
+
+    CREATE TABLE `posts` (
+        `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+        `user_id` int(11) NOT NULL DEFAULT '0',
+        `title` varchar(200) NOT NULL DEFAULT '',
+        `text` text NOT NULL,
+        `slug` varchar(200) NOT NULL,
+        `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+        `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+        PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+    VYTVOŘENÍ TRIGGERU
+    - 1. CREATE pro Insert, 2. CREATE pro Upload
+
+    CREATE TRIGGER posts_create BEFORE INSERT ON `posts`
+    FOR EACH ROW SET NEW.created_at = NOW(), NEW.updated_at = NOW();
+    CREATE TRIGGER posts_update BEFORE UPDATE ON `posts`
+    FOR EACH ROW SET NEW.updated_at = NOW(), NEW.created_at = OLD.created_at;
+
+2. TABULKA "comments"
+- podobná jako tabulka "posts", můžeme si ji nakopírovat - jen smažeme title, slug (pro komentář nepotřebujeme) a updated_at - může být, ale nyní ne
+    - id - INT
+    - user_id (kdo napsal komentář) - INT (komentář má pouze jedno user_id - komentář vždy napíše pouze jeden uživatel)
+    - post_id (jakému příspevku komentář patří) - INT (má pouze jedno post_id - komentář vždy bude patřit pouze jednomu příspěvku)
+        - jeden příspěvek může mít několik komentárů, ale komentář může patřit jen jednomu příspěvku
+        - tomu se říá tzv. 1 (příspěvek má):N(komentářů) relace N(komentářů patří):1(příspěvku)
+    - text (obsah komentáře) - TEXT
+    - created_at (kdy byl komentář vytvořen) - TIMESTAMP
+        - CURRENT_TIMESTAMP
+
+3. TABULKA "tags"
+- pro tabulku "tags" (pro tagy) budeme potřebovat:
+    - id - INT
+    - tag (samotný text) - VARCHAR
+    (post_id) - pokud bychom chtěli přidat jakému příspěvku tag patří, nemůžeme to udělat takto
+        - tag potřebuje patřit více příspěvkům (všem)
+        - musíme vytvořit přes tzv. PIVOT tabulku
+
+4. TABULKA "posts_tags"
+- pro tabulku "posts_tags" (tagy příspěvků) budeme potřebovat 2 hodnoty, které spolu vytvoří primární unikátní klíč
+    - post_id (jakému příspěvku) - INT
+    - tag_id (patří jaký tag) - INT
+
+CREATE TABLE `posts_tags` (
+    `post_id` int(11) unsigned NOT NULL DEFAULT '0',
+    `tag_id` int(11) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY (`tag_id`,`post_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+---------------------------------------------------------------------------------------------------------------------------------------
+== VÝPIS TABULEK ==
+- pokud budu chtít vypsat údaje příspěvku - použiju tabulku "posts"
+- pokud budd chtít i id tagů (jaké mu patří) - musím spojit s tabulkou "posts_tags"
+- pokud budu chtít i text tagů - musím spojit s tabulkou "tags"
+
+// vypsání tagů spojené s příspěvkěm 1 (takto najdem tagy patřící k příspěvku)
+SELECT t.tag FROM posts p
+JOIN posts_tags pt ON (p.id = pt.post_id)
+JOIN tags t ON (t.id = pt.tag_id)
+WHERE p.id = 1
+
+// vypsání všeho o příspěvku 1, včetně tagů spoojených do jednoho sloupce (odělené od sebe speciálním znakem)
+SELECT p.*, GROUP_CONCAT(t.tag SEPARATOR '~||~') AS tags
+FROM posts p
+JOIN posts_tags pt ON (p.id = pt.post_id)
+JOIN tags t ON (t.id = pt.tag_id)
+WHERE p.id = 1
+GROUP BY p.id
+
+== PROGRAM BLOGU ==
+- bude obsahovat
+    - login
+    - uživatele
+    - linky (slug místo index.php)
+    - budeme psát pomocí SQL doatzů (žádné Medoo)
