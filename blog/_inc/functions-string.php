@@ -9,9 +9,7 @@
  * @return string
  */
 function plain( $str ){
-/*  musíme kontrolovat, co jde do funkce (aby nebyl nějaký kód)
-    - ENT_QUOTES konvertuje jednoduché i dvojité uzvozovky
-*/
+
     return htmlspecialchars( $str, ENT_QUOTES );
 }
 /**
@@ -34,10 +32,6 @@ function word_limiter($str, $limit = 100, $end_char = '&#8230;'){
 
     return rtrim($matches[0]).$end_char;
 }
-/*
-    Vytvoříme si funkci na limitování znaků - vzatá z Codeigniter PHP frameworku
-    - můžeme do funkce poslat string a počet slov, které chceme aby ve stringu zůstali - ostatní se odstřihnou pryč
-*/
 
 /**
  * Add Paragraphs
@@ -88,7 +82,6 @@ function add_paragraphs( $str )
 
     return $str;
 }
-/* vytvoří odstavce, tam kde odstavce mají být, vytvoří entery tam kde mají být - můžeme použít v "functions-post.php" v naší funkci format_posts() */
 
 /**
  * Filter Url
@@ -120,7 +113,6 @@ function filter_url( $text )
 
     return $text;
 }
-/* z URL linků (www adresy) vytvoří klikatelné linky (<a> element)*/
 
 /**
  * Filter Url Parse Full Links
@@ -209,6 +201,3 @@ function slugify($text)
 
     return $text;
 }
-/*  neumí pokrýt všechny funkce (např. cirylika atd.)
-    - funkce se nazývá transliterate
-*/
