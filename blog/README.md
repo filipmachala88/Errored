@@ -152,9 +152,10 @@ v [Github issues](https://github.com/PHPAuth/PHPAuth/issues) se můžeme dočís
 - zde najdeme kód [jak se přihlásit](https://github.com/PHPAuth/PHPAuth/issues/52) a [jak zkontrolovat, jestli jsem přihlášený](https://github.com/PHPAuth/PHPAuth#how-to-secure-a-page)
 
 > do `config.php` vložíme přihlášení - změníme cesty a `include()` (používá se na šablony) na `require_once()` (na kusy kódu)
+> - nacházíme se již v config, nemusíme ho tedy zadávat do linku
 ```php
-require_once("_inc/Vendor/phpauth/phpauth/Config.php");
-require_once("_inc/Vendor/phpauth/phpauth/Auth.php");
+require_once("vendor/phpauth/phpauth/Config.php");
+require_once("vendor/phpauth/phpauth/Auth.php");
 ```
 > přístup do databáze `$db` už máme - můžeme nechat jen naši
 > - již duplikujeme hodnotu `$config` - přejmenujeme na `$auth_config` (vždy když budu vkládat kód z balíčku s `$config` - musím přepsat)
